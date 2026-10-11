@@ -1,0 +1,41 @@
+# The plugin manager's panel, drawn by herdr-panel. The rows come from
+# ./herdr-plugin-manager, which reads `herdr plugin list` and herdr's
+# config.toml (read only).
+spec = 1
+requires = ">=0.2"
+title = "Plugins"
+size = { width = "80%", height = "80%" }
+
+[[section]]
+id = "plugins"
+title = "Installed"
+kind = "list"
+source = ["./herdr-plugin-manager", "plugins"]
+columns = [
+  { key = "name", title = "Plugin" },
+  { key = "source", title = "From", width = 30 },
+  { key = "state", title = "State", width = 6 },
+]
+empty = "No plugins installed."
+row_actions = [
+  { label = "Enable", key = "e", run = ["./herdr-plugin-manager", "enable", "{row.id}"] },
+  { label = "Disable", key = "d", run = ["./herdr-plugin-manager", "disable", "{row.id}"],
+    confirm = "Disable {row.name}? {row.disable_note}" },
+]
+
+[[section]]
+title = "Keys for {sel.plugins.name}"
+kind = "list"
+source = ["./herdr-plugin-manager", "keys", "{sel.plugins.id}"]
+columns = [
+  { key = "key", title = "Key", width = 18 },
+  { key = "what", title = "Opens / runs" },
+  { key = "via", title = "How", width = 14 },
+]
+empty = "Select a plugin above."
+row_actions = [
+  # Closes the panel first: what it runs may open a popup of its own, and
+  # herdr shows one popup at a time.
+  { label = "Run", key = "r", run = ["./herdr-plugin-manager", "run", "{sel.plugins.id}", "{row.target}"],
+    after = "close_then_run" },
+]

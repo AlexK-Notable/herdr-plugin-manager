@@ -1,0 +1,29 @@
+id = "komi.plugin-manager"
+name = "Plugin Manager"
+description = "Lists installed plugins and, for the one selected, the keys that open its actions and panes"
+version = "0.1.0"
+min_herdr_version = "0.9.0"
+platforms = ["linux", "macos"]
+
+# Built at install time; Go 1.26 is the only requirement.
+[[build]]
+command = ["go", "build", "-o", "herdr-plugin-manager", "."]
+
+# The panel's renderer, herdr-panel, at the version go.mod pins.
+[[build]]
+command = ["go", "build", "-o", "bin/herdr-panel", "github.com/AlexK-Notable/herdr-panel/cmd/herdr-panel"]
+
+[[panes]]
+id = "manager"
+title = "Plugins"
+placement = "popup"
+width = "80%"
+height = "80%"
+command = ["./bin/herdr-panel", "panel.toml"]
+
+[[actions]]
+id = "open"
+title = "Plugin Manager"
+description = "Open the plugin manager"
+contexts = ["global"]
+command = ["./herdr-plugin-manager", "open"]
