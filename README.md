@@ -49,7 +49,7 @@ builds both binaries with Go 1.26. To bind a key, add this to herdr's
 
 ```toml
 [[keys.command]]
-key = "prefix+shift+p"
+key = "prefix+m"
 type = "plugin_action"
 command = "komi.plugin-manager.open"
 description = "plugin manager"
