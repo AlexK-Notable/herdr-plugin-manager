@@ -54,3 +54,9 @@ that pinned version into `bin/herdr-panel`.
   pin and `requires`.
 - Commits: present tense, saying what changed and why. MIT; contributions
   are inbound = outbound.
+- `main` is protected: force-pushes and deleting it are refused, and a pull
+  request merges only when every CI job passes (an admin may still push
+  directly). The required checks are the CI job names. Renaming or adding a
+  job means updating the protection's list (`gh api
+  repos/AlexK-Notable/herdr-plugin-manager/branches/main/protection`), or
+  pull requests wait on a check that never reports.
