@@ -7,7 +7,7 @@ require github.com/pelletier/go-toml/v2 v2.4.3
 require (
 	charm.land/bubbletea/v2 v2.1.0 // indirect
 	charm.land/lipgloss/v2 v2.0.6 // indirect
-	github.com/AlexK-Notable/herdr-panel v0.2.0 // indirect
+	github.com/AlexK-Notable/herdr-panel v0.2.1 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
 	github.com/charmbracelet/ultraviolet v0.0.0-20261008173134-6b8d4baf91b4 // indirect
 	github.com/charmbracelet/x/ansi v0.11.9 // indirect
