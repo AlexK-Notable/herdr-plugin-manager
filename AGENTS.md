@@ -11,7 +11,7 @@ supplies the panel's rows and carries out its actions. Read
 ## Layout
 
 ```
-main.go          subcommands: plugins, keys, enable, disable, run, open
+main.go          subcommands: plugins, keys, enable, disable, uninstall, run, open
 keys.go          herdr's config.toml bindings, and which plugin each belongs to
 herdr.go         the herdr CLI: plugin list, pane open with the ui_busy retry, notifications
 panel.toml       the panel (herdr-panel spec 1, requires >= 0.2)
@@ -37,8 +37,8 @@ that pinned version into `bin/herdr-panel`.
 4. **Run's result is never seen.** `after = "close_then_run"` runs it after
    the panel has closed. A failure must reach the user some other way: a
    herdr notification.
-5. **The manager never disables itself.** `selfID` must match the
-   manifest's `id`.
+5. **The manager never disables or uninstalls itself.** `selfID` must
+   match the manifest's `id`.
 6. **Commands never go through a shell**, with one exception: pressing a
    `shell` binding runs that binding's own command from the user's config,
    exactly as herdr would.

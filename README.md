@@ -9,7 +9,7 @@ select, the keys that open its actions and panes.
 │ ▸ herdr-file-viewer   smarzban/herdr-file-viewer   on  │
 │   Auto Title          local                        on  │
 │   Other keys          config.toml                      │
-│   [e Enable] [d Disable]                               │
+│   [e Enable] [d Disable] [u Uninstall]                 │
 │                                                        │
 │ Keys for herdr-file-viewer                             │
 │ › prefix+f        Open file viewer        plugin_action│
@@ -27,6 +27,11 @@ select, the keys that open its actions and panes.
   **Other keys**, not dropped.
 - **Enable / Disable** (`e`, `d`) turn a plugin on or off in herdr.
   Disabling asks first. The manager will not disable itself.
+- **Uninstall** (`u`) removes a plugin from herdr, after asking. herdr
+  deletes only a copy it cloned itself (a plugin installed from GitHub); a
+  linked plugin's folder stays. Every plugin's settings and state stay, so
+  installing or linking it again picks them up. The manager will not
+  uninstall itself.
 - **Run** (`r`) closes the panel, then runs the selected row: it invokes the
   action, opens the pane (it retries for a moment while herdr closes the
   panel's popup), or does what the key does. The panel cannot show what

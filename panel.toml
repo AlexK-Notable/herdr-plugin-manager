@@ -21,6 +21,8 @@ row_actions = [
   { label = "Enable", key = "e", run = ["./herdr-plugin-manager", "enable", "{row.id}"] },
   { label = "Disable", key = "d", run = ["./herdr-plugin-manager", "disable", "{row.id}"],
     confirm = "Disable {row.name}? {row.disable_note}" },
+  { label = "Uninstall", key = "u", run = ["./herdr-plugin-manager", "uninstall", "{row.id}"],
+    confirm = "Uninstall {row.name}? {row.uninstall_note}" },
 ]
 
 [[section]]

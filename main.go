@@ -25,6 +25,7 @@ const usage = `usage: herdr-plugin-manager <command>
   keys <plugin>        a plugin's keys, actions and panes, as rows (JSON)
   enable <plugin>      enable a plugin
   disable <plugin>     disable a plugin
+  uninstall <plugin>   uninstall a plugin (its settings stay)
   run <plugin> <what>  run an action:<id>, open a pane:<id>, or press key:<n>
   open                 open the manager's popup`
 
@@ -43,6 +44,9 @@ func dispatch(args []string, stdout, stderr io.Writer) int {
 		return rowsOut(stdout, stderr, func() (any, error) { return keysFor(ctx, h, args[1]) })
 	case len(args) == 2 && (args[0] == "enable" || args[0] == "disable"):
 		msg, err := setEnabled(ctx, h, args[1], args[0] == "enable")
+		return result(stdout, msg, err)
+	case len(args) == 2 && args[0] == "uninstall":
+		msg, err := uninstall(ctx, h, args[1])
 		return result(stdout, msg, err)
 	case len(args) == 3 && args[0] == "run":
 		// Runs after the panel has closed: nobody sees its output, so a
@@ -100,6 +104,8 @@ type PluginRow struct {
 	Source      string `json:"source"`
 	State       string `json:"state"`
 	DisableNote string `json:"disable_note"`
+	// UninstallNote says what uninstalling keeps and what it deletes.
+	UninstallNote string `json:"uninstall_note"`
 }
 
 func pluginRows(ctx context.Context, h herdr) ([]PluginRow, error) {
@@ -114,6 +120,7 @@ func pluginRows(ctx context.Context, h herdr) ([]PluginRow, error) {
 		if p.Enabled {
 			r.State = "on"
 		}
+		r.UninstallNote = uninstallNote(p)
 		if p.ID == selfID {
 			r.DisableNote = "This is the plugin manager itself; it will not disable itself."
 		}
@@ -129,7 +136,7 @@ func pluginRows(ctx context.Context, h herdr) ([]PluginRow, error) {
 	}
 	if unattributed(plugins, bindings) {
 		rows = append(rows, PluginRow{ID: otherID, Name: "Other keys", Source: "config.toml", State: "",
-			DisableNote: "These are keys, not a plugin."})
+			DisableNote: "These are keys, not a plugin.", UninstallNote: "These are keys, not a plugin."})
 	}
 	return rows, nil
 }
@@ -175,6 +182,35 @@ func setEnabled(ctx context.Context, h herdr, id string, on bool) (string, error
 		return "", err
 	}
 	return done + " " + id, nil
+}
+
+// uninstall removes a plugin from herdr. herdr deletes only a checkout it
+// cloned itself (an installed plugin); a linked plugin's folder, and every
+// plugin's config and state directories, stay.
+func uninstall(ctx context.Context, h herdr, id string) (string, error) {
+	switch id {
+	case otherID:
+		return "", errors.New("these are keys, not a plugin")
+	case selfID:
+		return "", errors.New("the plugin manager will not uninstall itself")
+	}
+	if _, err := h.run(ctx, "plugin", "uninstall", id); err != nil {
+		return "", err
+	}
+	return "uninstalled " + id, nil
+}
+
+func uninstallNote(p Plugin) string {
+	switch {
+	case p.ID == selfID:
+		return "This is the plugin manager itself; it will not uninstall itself."
+	case p.Source.Kind == "github" && p.Source.Owner != "":
+		repo := p.Source.Owner + "/" + p.Source.Repo
+		return "herdr deletes its copy of " + repo + "; its settings stay. Installing " + repo + " again brings it back."
+	case p.Source.Kind == "local":
+		return "herdr forgets it; its folder and its settings stay. Linking the folder again brings it back."
+	}
+	return "Its settings stay."
 }
 
 // runTarget runs what a keys row names. It starts once the panel has exited,

@@ -138,3 +138,43 @@ func TestRunFailureNotifies(t *testing.T) { //nolint:paralleltest // sets the en
 		t.Errorf("no notification: %q", got)
 	}
 }
+
+func TestUninstall(t *testing.T) { //nolint:paralleltest // sets the environment
+	log := fakeHerdr(t, 0)
+	for _, id := range []string{"komi.plugin-manager", otherID} {
+		if code, out, _ := do("uninstall", id); code == 0 || !strings.Contains(out, `"ok":false`) {
+			t.Errorf("uninstall %s: %d %s", id, code, out)
+		}
+	}
+	if code, out, _ := do("uninstall", "viewer"); code != 0 || !strings.Contains(out, `"ok":true`) {
+		t.Errorf("uninstall: %d %s", code, out)
+	}
+	got := calls(t, log)
+	if got[len(got)-1] != "plugin uninstall viewer" {
+		t.Errorf("calls %q", got)
+	}
+	for _, c := range got {
+		if strings.Contains(c, "komi.plugin-manager") || strings.Contains(c, otherID) {
+			t.Errorf("herdr was asked to uninstall what it must not: %q", c)
+		}
+	}
+}
+
+func TestUninstallNotes(t *testing.T) { //nolint:paralleltest // sets the environment
+	fakeHerdr(t, 0)
+	_, out, _ := do("plugins")
+	var rows []PluginRow
+	if err := json.Unmarshal([]byte(out), &rows); err != nil {
+		t.Fatal(err)
+	}
+	notes := map[string]string{}
+	for _, r := range rows {
+		notes[r.ID] = r.UninstallNote
+	}
+	if n := notes["viewer"]; !strings.Contains(n, "deletes its copy of o/r") || !strings.Contains(n, "settings stay") {
+		t.Errorf("installed plugin note %q", n)
+	}
+	if n := notes["komi.plugin-manager"]; !strings.Contains(n, "will not uninstall itself") {
+		t.Errorf("self note %q", n)
+	}
+}
